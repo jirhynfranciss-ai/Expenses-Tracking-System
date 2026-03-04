@@ -53,8 +53,8 @@ function LoadingScreen({ message = 'Loading…' }: { message?: string }) {
             <div className="absolute top-1/2 -right-1 -translate-y-1/2 w-1.5 h-1.5 bg-pink-400 rounded-full shadow-lg shadow-pink-400/80" />
           </div>
           {/* Center logo */}
-          <div className="absolute inset-5 rounded-full bg-gradient-to-br from-indigo-600 to-purple-700 flex items-center justify-center shadow-2xl animate-pulse-glow">
-            <img src={logo} alt="SpendWise" className="w-10 h-10" />
+          <div className="absolute inset-4 rounded-2xl flex items-center justify-center animate-pulse-glow drop-shadow-2xl">
+            <img src={logo} alt="SpendWise" className="w-16 h-16 drop-shadow-[0_0_18px_rgba(99,102,241,0.9)]" />
           </div>
         </div>
 
