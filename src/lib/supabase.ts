@@ -1,47 +1,38 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl     = (import.meta.env.VITE_SUPABASE_URL     as string) ?? 'https://ujwmmcfsctfdziijrcym.supabase.co';
-const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) ?? 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqd21tY2ZzY3RmZHppaWpyY3ltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTg4MzQsImV4cCI6MjA4ODEzNDgzNH0.0wQ1vAWPwmHBazRpK9uIYY5ewJkNsGISMypuyEDC9L8';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
 
-export const isSupabaseConfigured: boolean =
-  supabaseUrl.length > 10 &&
-  !supabaseUrl.includes('placeholder') &&
-  supabaseAnonKey.length > 10 &&
-  !supabaseAnonKey.includes('placeholder');
+const isMissing = !SUPABASE_URL || !SUPABASE_ANON_KEY
+  || SUPABASE_URL === 'https://ujwmmcfsctfdziijrcym.supabase.co'
+  || SUPABASE_ANON_KEY === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqd21tY2ZzY3RmZHppaWpyY3ltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTg4MzQsImV4cCI6MjA4ODEzNDgzNH0.0wQ1vAWPwmHBazRpK9uIYY5ewJkNsGISMypuyEDC9L8';
+
+export const isSupabaseConfigured = !isMissing;
 
 export const supabase = createClient(
-  supabaseUrl     || 'https://placeholder.supabase.co',
-  supabaseAnonKey || 'placeholder-anon-key',
+  isMissing ? 'https://placeholder.supabase.co' : SUPABASE_URL,
+  isMissing ? 'placeholder-key' : SUPABASE_ANON_KEY,
   {
     auth: {
-      autoRefreshToken:   true,
-      persistSession:     true,
+      persistSession: true,
+      autoRefreshToken: true,
       detectSessionInUrl: true,
-      flowType:           'implicit',
-      storageKey:         'spendwise-auth',
+      flowType: 'implicit',
+      storageKey: 'spendwise-auth',
+      storage: window.localStorage,
     },
   }
 );
 
-/** Always returns the current origin — works on any port / domain */
 export function getRedirectUrl(): string {
-  if (typeof window === 'undefined') return 'http://localhost:5173';
   return window.location.origin;
 }
 
-/** Strips OAuth tokens / codes from the address bar */
 export function cleanUrl(): void {
-  try {
-    const { hash, search, pathname } = window.location;
-    const dirty =
-      hash.includes('access_token')  ||
-      hash.includes('refresh_token') ||
-      hash.includes('type=signup')   ||
-      hash.includes('type=recovery') ||
-      hash.includes('error=')        ||
-      search.includes('code=')       ||
-      search.includes('error=')      ||
-      search.includes('token=');
-    if (dirty) window.history.replaceState(null, '', pathname || '/');
-  } catch { /* non-critical */ }
+  const url = window.location.href;
+  const hasHash = url.includes('#access_token=') || url.includes('#error=');
+  const hasCode = url.includes('?code=') || url.includes('&code=');
+  if (hasHash || hasCode) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
 }
