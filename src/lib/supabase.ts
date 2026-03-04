@@ -1,38 +1,51 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+const supabaseUrl     = (import.meta.env.VITE_SUPABASE_URL     as string) || "https://ujwmmcfsctfdziijrcym.supabase.co";
+const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqd21tY2ZzY3RmZHppaWpyY3ltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTg4MzQsImV4cCI6MjA4ODEzNDgzNH0.0wQ1vAWPwmHBazRpK9uIYY5ewJkNsGISMypuyEDC9L8";
 
-const isMissing = !SUPABASE_URL || !SUPABASE_ANON_KEY
-  || SUPABASE_URL === 'https://ujwmmcfsctfdziijrcym.supabase.co'
-  || SUPABASE_ANON_KEY === 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqd21tY2ZzY3RmZHppaWpyY3ltIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NTg4MzQsImV4cCI6MjA4ODEzNDgzNH0.0wQ1vAWPwmHBazRpK9uIYY5ewJkNsGISMypuyEDC9L8';
-
-export const isSupabaseConfigured = !isMissing;
+export const isSupabaseConfigured: boolean =
+  supabaseUrl.length > 0 &&
+  !supabaseUrl.includes("placeholder") &&
+  supabaseAnonKey.length > 0 &&
+  !supabaseAnonKey.includes("placeholder");
 
 export const supabase = createClient(
-  isMissing ? 'https://placeholder.supabase.co' : SUPABASE_URL,
-  isMissing ? 'placeholder-key' : SUPABASE_ANON_KEY,
+  supabaseUrl     || "https://placeholder.supabase.co",
+  supabaseAnonKey || "placeholder-anon-key",
   {
     auth: {
-      persistSession: true,
-      autoRefreshToken: true,
+      autoRefreshToken:   true,
+      persistSession:     true,
       detectSessionInUrl: true,
-      flowType: 'implicit',
-      storageKey: 'spendwise-auth',
-      storage: window.localStorage,
+      flowType:           "implicit",
+      storageKey:         "spendwise-auth",
     },
   }
 );
 
+/** Returns the correct redirect URL for OAuth — always uses current origin */
 export function getRedirectUrl(): string {
+  if (typeof window === "undefined") return "http://localhost:5173";
   return window.location.origin;
 }
 
+/** Removes OAuth tokens from the address bar after Supabase reads them */
 export function cleanUrl(): void {
-  const url = window.location.href;
-  const hasHash = url.includes('#access_token=') || url.includes('#error=');
-  const hasCode = url.includes('?code=') || url.includes('&code=');
-  if (hasHash || hasCode) {
-    window.history.replaceState({}, document.title, window.location.pathname);
+  try {
+    const { hash, search, pathname } = window.location;
+    const dirty =
+      hash.includes("access_token")  ||
+      hash.includes("refresh_token") ||
+      hash.includes("type=signup")   ||
+      hash.includes("type=recovery") ||
+      hash.includes("error=")        ||
+      search.includes("code=")       ||
+      search.includes("error=")      ||
+      search.includes("token=");
+    if (dirty) {
+      window.history.replaceState(null, "", pathname || "/");
+    }
+  } catch {
+    // non-critical
   }
 }
