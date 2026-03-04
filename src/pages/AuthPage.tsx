@@ -388,8 +388,8 @@ export default function AuthPage() {
         <div className="w-full max-w-md z-10">
           {/* Logo */}
           <div className="text-center mb-8 animate-fade-in-down">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-600/30 to-purple-700/30 border border-indigo-500/30 mb-4 shadow-2xl animate-pulse-glow animate-float">
-              <img src={logo} alt="SpendWise" className="w-12 h-12" />
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl mb-4 shadow-2xl animate-float" style={{ filter: 'drop-shadow(0 0 24px rgba(99,102,241,0.7))' }}>
+              <img src={logo} alt="SpendWise" className="w-24 h-24" />
             </div>
             <h1 className="text-4xl font-bold text-white tracking-tight">
               Spend<span className="gradient-text">Wise</span>
