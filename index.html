@@ -3,35 +3,54 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- ══ Primary Meta ══════════════════════════════════════════════════ -->
     <title>SpendWise – Smart Expense Tracker</title>
+    <meta name="description" content="SpendWise — Track your expenses, manage budgets, split costs, and gain full financial visibility. Powered by Supabase." />
+    <meta name="author" content="SpendWise" />
+    <meta name="theme-color" content="#4F46E5" />
+    <meta name="color-scheme" content="light" />
+
+    <!-- ══ Favicon (SVG — works in all modern browsers) ════════════════ -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/logo.svg" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- ══ Open Graph (Facebook / LinkedIn preview) ══════════════════════ -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SpendWise – Smart Expense Tracker" />
+    <meta property="og:description" content="Track expenses, manage budgets, split costs with friends. Real-time financial insights." />
+    <meta property="og:image" content="/logo.svg" />
+    <meta property="og:site_name" content="SpendWise" />
+
+    <!-- ══ Twitter Card ══════════════════════════════════════════════════ -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="SpendWise – Smart Expense Tracker" />
+    <meta name="twitter:description" content="Track expenses, manage budgets, split costs with friends." />
+    <meta name="twitter:image" content="/logo.svg" />
+
+    <!-- ══ Source Protection ════════════════════════════════════════════ -->
+    <!--
+      CRITICAL RULES:
+      1. NEVER touch window.location.hash — Supabase reads the OAuth
+         #access_token from it BEFORE React loads. Clearing it breaks login.
+      2. NEVER block Ctrl+Shift+I/J/C via keydown — Google's OAuth popup
+         and redirect flow uses these internally. Blocking them causes
+         Error 403: disallowed_useragent.
+      AuthContext.cleanUrl() handles URL cleanup AFTER Supabase reads the token.
+    -->
     <script>
-      /**
-       * SpendWise — Source Protection
-       *
-       * CRITICAL RULES:
-       * 1. NEVER touch window.location.hash — Supabase reads the OAuth
-       *    #access_token from it BEFORE React loads. Clearing it breaks login.
-       * 2. NEVER block Ctrl+Shift+I/J/C via keydown — Google's OAuth popup
-       *    and redirect flow uses these internally. Blocking them causes
-       *    Error 403: disallowed_useragent in some browser environments.
-       *
-       * AuthContext.cleanUrl() handles URL cleanup AFTER Supabase reads
-       * the token. Do not move or duplicate that logic here.
-       */
       (function () {
         'use strict';
 
-        // 1 ── Disable right-click context menu
+        /* 1 — Disable right-click context menu */
         document.addEventListener('contextmenu', function (e) {
           e.preventDefault();
           return false;
         }, true);
 
-        // 2 ── Block ONLY F12 (DevTools open shortcut)
-        //      We intentionally do NOT block Ctrl+Shift+I/J/C/U because:
-        //      - Google OAuth flow uses these headers internally
-        //      - Blocking them can trigger Google's "disallowed_useragent" error
-        //      - The console is already silenced below, making F12 useless anyway
+        /* 2 — Block F12 only (DevTools open shortcut) */
         document.addEventListener('keydown', function (e) {
           if (e.key === 'F12' || e.keyCode === 123) {
             e.preventDefault();
@@ -40,9 +59,8 @@
           }
         }, true);
 
-        // 3 ── Silence all console output
-        //      Even if DevTools is opened, nothing useful will appear.
-        (function silenceConsole() {
+        /* 3 — Silence console output */
+        (function () {
           var noop = function () {};
           var methods = [
             'log','warn','error','info','debug','dir','dirxml','table','trace',
@@ -56,13 +74,17 @@
           }
         })();
 
-        // 4 ── Clickjacking / iframe protection
+        /* 4 — Clickjacking / iframe protection */
         if (window.self !== window.top) {
           try { window.top.location = window.self.location; } catch (_) {}
         }
 
       })();
     </script>
+
+    <!-- ══ Preconnect to Supabase for faster auth ═══════════════════════ -->
+    <link rel="preconnect" href="https://supabase.co" />
+    <link rel="dns-prefetch" href="https://supabase.co" />
   </head>
   <body>
     <div id="root"></div>
